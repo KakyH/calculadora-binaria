@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor de Bases Numéricas</title>
+    <style>
+        /* Estilos generales para una apariencia moderna y atractiva */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input[type="number"]:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            background: white;
+            margin-bottom: 20px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+        }
+
+        .output {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .output h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+
+        .output p {
+            margin: 5px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            color: #667eea;
+        }
+
+        .steps {
+            background: #e8f4fd;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            border-left: 3px solid #3498db;
+        }
+
+        .error {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        /* Responsive design */
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.5em;
+            }
+            .steps {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Conversor de Bases Numéricas</h1>
+        <p style="text-align: center; color: #666; margin-bottom: 20px;">
+            Ingresa un número en la base de origen y selecciona el tipo de conversión. Verás los pasos detallados.
+        </p>
+
+        <div class="input-group">
+            <label for="inputValue">Valor de entrada:</label>
+            <input type="text" id="inputValue" placeholder="Ej: 255 para decimal, FF para hex, 11111111 para binario">
+        </div>
+
+        <div class="input-group">
+            <label for="fromBase">De base:</label>
+            <select id="fromBase">
+                <option value="decimal">Decimal (10)</option>
+                <option value="binary">Binario (2)</option>
+                <option value="hex">Hexadecimal (16)</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label for="toBase">A base:</label>
+            <select id="toBase">
+                <option value="decimal">Decimal (10)</option>
+                <option value="binary">Binario (2)</option>
+                <option value="hex">Hexadecimal (16)</option>
+            </select>
+        </div>
+
+        <button onclick="convertir()">Convertir</button>
+
+        <div id="output" class="output" style="display: none;">
+            <h3>Resultado:</h3>
+            <p id="result"></p>
+            <div id="steps" class="steps" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        function convertir() {
+            const inputValue = document.getElementById('inputValue').value.trim();
+            const fromBase = document.getElementById('fromBase').value;
+            const toBase = document.getElementById('toBase').value;
+            const output = document.getElementById('output');
+            const result = document.getElementById('result');
+            const stepsDiv = document.getElementById('steps');
+
+            if (!inputValue) {
+                result.innerHTML = '<span class="error">Por favor, ingresa un valor.</span>';
+                output.style.display = 'block';
+                stepsDiv.style.display = 'none';
+                return;
+            }
+
+            let decimalValue;
+            let error = false;
+
+            // Convertir entrada a decimal según la base de origen
+            try {
+                if (fromBase === 'decimal') {
+                    decimalValue = parseInt(inputValue, 10);
+                    if (isNaN(decimalValue) || decimalValue < 0) {
+                        throw new Error('Número decimal inválido.');
+                    }
+                } else if (fromBase === 'binary') {
+                    if (!/^[01]+$/.test(inputValue)) {
+                        throw new Error('Binario inválido (solo 0 y 1).');
+                    }
+                    decimalValue = parseInt(inputValue, 2);
+                } else if (fromBase === 'hex') {
+                    if (!/^[0-9A-Fa-f]+$/.test(inputValue)) {
+                        throw new Error('Hexadecimal inválido (0-9, A-F).');
+                    }
+                    decimalValue = parseInt(inputValue, 16);
+                }
+
+                if (isNaN(decimalValue)) {
+                    throw new Error('Conversión inválida.');
+                }
+            } catch (e) {
+                result.innerHTML = `<span class="error">Error: ${e.message}</span>`;
+                output.style.display = 'block';
+                stepsDiv.style.display = 'none';
+                return;
+            }
+
+            // Convertir de decimal a la base destino
+            let convertedValue;
+            if (toBase === 'decimal') {
+                convertedValue = decimalValue.toString(10);
+            } else if (toBase === 'binary') {
+                convertedValue = decimalValue.toString(2);
+            } else if (toBase === 'hex') {
+                convertedValue = decimalValue.toString(16).toUpperCase();
+            }
+
+            // Mostrar todas las conversiones para mayor utilidad
+            const binary = decimalValue.toString(2);
+            const hex = decimalValue.toString(16).toUpperCase();
+            const decimal = decimalValue.toString(10);
+
+            result.innerHTML = `
+                <strong>Decimal:</strong> ${decimal}<br>
+                <strong>Binario:</strong> ${binary}<br>
+                <strong>Hexadecimal:</strong> ${hex}<br>
+                <em>Conversión solicitada (${fromBase} a ${toBase}): ${convertedValue}</em>
+            `;
+
+            // Generar pasos de la conversión solicitada
+            const steps = generarPasos(fromBase, toBase, inputValue, decimalValue, convertedValue);
+            stepsDiv.innerHTML = steps;
+            stepsDiv.style.display = 'block';
+
+            output.style.display = 'block';
+        }
+
+        function generarPasos(fromBase, toBase, inputValue, decimalValue, convertedValue) {
+            let pasos = `Pasos de la conversión de ${inputValue} (${fromBase}) a ${convertedValue} (${toBase}):\n\n`;
+
+            if (fromBase === 'decimal' && toBase === 'decimal') {
+                pasos += 'La base de origen y destino son iguales. No se requieren operaciones adicionales.';
+                return pasos;
+            }
+
+            // Si fromBase no es decimal, primero convertir a decimal
+            if (fromBase !== 'decimal') {
+                pasos += `1. Convertir de ${fromBase} a decimal:\n`;
+                if (fromBase === 'binary') {
+                    pasos += generarPasosBinToDec(inputValue);
+                } else if (fromBase === 'hex') {
+                    pasos += generarPasosHexToDec(inputValue);
+                }
+                pasos += `\nResultado intermedio: ${decimalValue} (decimal)\n\n`;
+            }
+
+            // Si toBase no es decimal, convertir de decimal a toBase
+            if (toBase !== 'decimal') {
+                pasos += `2. Convertir de decimal a ${toBase}:\n`;
+                if (toBase === 'binary') {
+                    pasos += generarPasosDecToBin(decimalValue);
+                } else if (toBase === 'hex') {
+                    pasos += generarPasosDecToHex(decimalValue);
+                }
+            }
+
+            if (fromBase === 'decimal' && toBase === 'decimal') {
+                // Ya manejado arriba
+            } else if (fromBase !== 'decimal' && toBase === 'decimal') {
+                // Solo el paso 1
+                pasos = pasos.replace('2. ', ''); // Remover el 2 si no aplica
+            } else if (fromBase === 'decimal' && toBase !== 'decimal') {
+                pasos = pasos.replace('1. ', ''); // Remover el 1 si no aplica
+            }
+
+            return pasos;
+        }
+
+        function generarPasosBinToDec(binario) {
+            let pasos = '';
+            let temp = binario.split('').reverse().join('');
+            let valor = 0;
+            for (let i = 0; i < temp.length; i++) {
+                const bit = parseInt(temp[i]);
+                const potencia = Math.pow(2, i);
+                valor += bit * potencia;
+                pasos += `   ${bit} × 2^${i} = ${bit * potencia}\n`;
+            }
+            pasos += `Suma total: ${valor}`;
+            return pasos;
+        }
+
+        function generarPasosHexToDec(hex) {
+            let pasos = '';
+            let temp = hex.toUpperCase().split('').reverse().join('');
+            let valor = 0;
+            for (let i = 0; i < temp.length; i++) {
+                const digito = parseInt(temp[i], 16);
+                const potencia = Math.pow(16, i);
+                valor += digito * potencia;
+                const digitoStr = isNaN(digito) ? temp[i] : digito.toString();
+                pasos += `   ${digitoStr} × 16^${i} = ${digito * potencia}\n`;
+            }
+            pasos += `Suma total: ${valor}`;
+            return pasos;
+        }
+
+        function generarPasosDecToBin(decimal) {
+            let pasos = '';
+            let temp = decimal;
+            let binario = '';
+            let count = 0;
+            while (temp > 0) {
+                const residuo = temp % 2;
+                const cociente = Math.floor(temp / 2);
+                binario = residuo + binario;
+                pasos += `   ${temp} ÷ 2 = cociente ${cociente}, residuo ${residuo}\n`;
+                temp = cociente;
+                count++;
+            }
+            if (decimal === 0) {
+                pasos += '   0 (caso especial: binario es 0)';
+            }
+            pasos += `\nBinario (de residuo a cociente): ${binario}`;
+            return pasos;
+        }
+
+        function generarPasosDecToHex(decimal) {
+            let pasos = '';
+            let temp = decimal;
+            let hex = '';
+            let count = 0;
+            while (temp > 0) {
+                const residuo = temp % 16;
+                const cociente = Math.floor(temp / 16);
+                const residuoHex = residuo > 9 ? String.fromCharCode(65 + (residuo - 10)) : residuo.toString();
+                hex = residuoHex + hex;
+                pasos += `   ${temp} ÷ 16 = cociente ${cociente}, residuo ${residuoHex} (${residuo})\n`;
+                temp = cociente;
+                count++;
+            }
+            if (decimal === 0) {
+                pasos += '   0 (caso especial: hexadecimal es 0)';
+            }
+            pasos += `\nHexadecimal (de residuo a cociente): ${hex}`;
+            return pasos;
+        }
+
+        // Permitir conversión con Enter
+        document.getElementById('inputValue').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                convertir();
+            }
+        });
+
+        // Auto-detectar base de entrada si es posible (opcional, pero mejora UX)
+        document.getElementById('inputValue').addEventListener('input', function() {
+            const value = this.value.trim();
+            const fromSelect = document.getElementById('fromBase');
+            if (value && fromSelect.value === 'decimal') { // Solo auto-detectar si está en decimal por defecto
+                if (/^[01]+$/.test(value)) {
+                    fromSelect.value = 'binary';
+                } else if (/^[0-9A-Fa-f]+$/.test(value) && !/^[0-9]+$/.test(value)) {
+                    fromSelect.value = 'hex';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
