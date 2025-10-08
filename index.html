@@ -133,6 +133,56 @@
                 font-size: 12px;
             }
         }
+
+        /* Estilos para el conversor de unidades de Bits/Bytes */
+        .unit-converter {
+            background: #fafcff;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(102,126,234,0.08);
+            padding: 24px;
+            margin: 32px 0 0 0;
+            border-top: 5px solid #764ba2;
+        }
+        .unit-converter h2 {
+            margin-top: 0;
+            color: #764ba2;
+            text-align: center;
+        }
+        .unit-converter .row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        .unit-converter input,
+        .unit-converter select {
+            flex: 1;
+            min-width: 80px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+        .unit-converter button {
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: box-shadow 0.2s;
+        }
+        .unit-converter button:hover {
+            box-shadow: 0 3px 10px rgba(102,126,234,0.18);
+        }
+        .unit-converter .result {
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            color: #764ba2;
+            margin-top: 8px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -172,6 +222,41 @@
             <p id="result"></p>
             <div id="steps" class="steps" style="display: none;"></div>
         </div>
+    </div>
+
+    <!-- Conversor de unidades de Bits/Bytes y múltiplos -->
+    <div class="unit-converter" id="unit-converter">
+        <h2>Conversor de Unidades Digitales</h2>
+        <div class="row">
+            <input type="number" id="unitInputValue" placeholder="Cantidad" min="0">
+            <select id="unitInput">
+                <option value="bit">Bit</option>
+                <option value="byte">Byte</option>
+                <option value="kbit">Kilobit (Kbit)</option>
+                <option value="mbit">Megabit (Mbit)</option>
+                <option value="gbit">Gigabit (Gbit)</option>
+                <option value="tbit">Terabit (Tbit)</option>
+                <option value="kb">Kilobyte (KB)</option>
+                <option value="mb">Megabyte (MB)</option>
+                <option value="gb">Gigabyte (GB)</option>
+                <option value="tb">Terabyte (TB)</option>
+            </select>
+            <span style="align-self:center;">→</span>
+            <select id="unitOutput">
+                <option value="bit">Bit</option>
+                <option value="byte">Byte</option>
+                <option value="kbit">Kilobit (Kbit)</option>
+                <option value="mbit">Megabit (Mbit)</option>
+                <option value="gbit">Gigabit (Gbit)</option>
+                <option value="tbit">Terabit (Tbit)</option>
+                <option value="kb">Kilobyte (KB)</option>
+                <option value="mb">Megabyte (MB)</option>
+                <option value="gb">Gigabyte (GB)</option>
+                <option value="tb">Terabyte (TB)</option>
+            </select>
+        </div>
+        <button onclick="convertUnits()">Convertir</button>
+        <div id="unitResult" class="result"></div>
     </div>
 
     <script>
@@ -382,6 +467,54 @@
                 }
             }
         });
+
+        // Conversor de unidades de Bits/Bytes y múltiplos
+        function convertUnits() {
+            const value = parseFloat(document.getElementById('unitInputValue').value);
+            const inputUnit = document.getElementById('unitInput').value;
+            const outputUnit = document.getElementById('unitOutput').value;
+            const resultDiv = document.getElementById('unitResult');
+
+            // Factores de conversión (todas las unidades en bits)
+            const units = {
+                bit: 1,
+                byte: 8,
+                kbit: 1000,
+                mbit: 1000*1000,
+                gbit: 1000*1000*1000,
+                tbit: 1000*1000*1000*1000,
+                kb: 8*1000,
+                mb: 8*1000*1000,
+                gb: 8*1000*1000*1000,
+                tb: 8*1000*1000*1000*1000,
+            };
+
+            if (isNaN(value) || value < 0) {
+                resultDiv.innerText = "Ingresa una cantidad válida.";
+                return;
+            }
+            // Convertir a bits, luego a la unidad de salida
+            const bits = value * units[inputUnit];
+            const result = bits / units[outputUnit];
+
+            resultDiv.innerText = `${value} ${getUnitLabel(inputUnit)} = ${result} ${getUnitLabel(outputUnit)}`;
+        }
+
+        function getUnitLabel(unit) {
+            switch (unit) {
+                case 'bit': return "bits";
+                case 'byte': return "bytes";
+                case 'kbit': return "kilobits";
+                case 'mbit': return "megabits";
+                case 'gbit': return "gigabits";
+                case 'tbit': return "terabits";
+                case 'kb': return "kilobytes";
+                case 'mb': return "megabytes";
+                case 'gb': return "gigabytes";
+                case 'tb': return "terabytes";
+                default: return unit;
+            }
+        }
     </script>
 </body>
 </html>
