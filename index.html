@@ -328,17 +328,17 @@
             let binario = '';
             let count = 0;
             while (temp > 0) {
-                const residuo = temp % 2;
+                const resto = temp % 2;
                 const cociente = Math.floor(temp / 2);
-                binario = residuo + binario;
-                pasos += `   ${temp} ÷ 2 = cociente ${cociente}, residuo ${residuo}\n`;
+                binario = resto + binario;
+                pasos += `   ${temp} ÷ 2 = cociente ${cociente}, resto ${resto}\n`;
                 temp = cociente;
                 count++;
             }
             if (decimal === 0) {
                 pasos += '   0 (caso especial: binario es 0)';
             }
-            pasos += `\nBinario (de residuo a cociente): ${binario}`;
+            pasos += `\nBinario (de resto a cociente): ${binario}`;
             return pasos;
         }
 
@@ -348,18 +348,18 @@
             let hex = '';
             let count = 0;
             while (temp > 0) {
-                const residuo = temp % 16;
+                const resto = temp % 16;
                 const cociente = Math.floor(temp / 16);
-                const residuoHex = residuo > 9 ? String.fromCharCode(65 + (residuo - 10)) : residuo.toString();
-                hex = residuoHex + hex;
-                pasos += `   ${temp} ÷ 16 = cociente ${cociente}, residuo ${residuoHex} (${residuo})\n`;
+                const restoHex = resto > 9 ? String.fromCharCode(65 + (resto - 10)) : resto.toString();
+                hex = restoHex + hex;
+                pasos += `   ${temp} ÷ 16 = cociente ${cociente}, resto ${restoHex} (${resto})\n`;
                 temp = cociente;
                 count++;
             }
             if (decimal === 0) {
                 pasos += '   0 (caso especial: hexadecimal es 0)';
             }
-            pasos += `\nHexadecimal (de residuo a cociente): ${hex}`;
+            pasos += `\nHexadecimal (de resto a cociente): ${hex}`;
             return pasos;
         }
 
