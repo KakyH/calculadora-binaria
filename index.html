@@ -151,7 +151,7 @@
             <label for="fromBase">De base:</label>
             <select id="fromBase">
                 <option value="decimal">Decimal (10)</option>
-                <option value="binary">Binario (2)</option>
+                <option value="binario">Binario (2)</option>
                 <option value="hex">Hexadecimal (16)</option>
             </select>
         </div>
@@ -160,7 +160,7 @@
             <label for="toBase">A base:</label>
             <select id="toBase">
                 <option value="decimal">Decimal (10)</option>
-                <option value="binary">Binario (2)</option>
+                <option value="binario">Binario (2)</option>
                 <option value="hex">Hexadecimal (16)</option>
             </select>
         </div>
@@ -200,7 +200,7 @@
                     if (isNaN(decimalValue) || decimalValue < 0) {
                         throw new Error('Número decimal inválido.');
                     }
-                } else if (fromBase === 'binary') {
+                } else if (fromBase === 'binario') {
                     if (!/^[01]+$/.test(inputValue)) {
                         throw new Error('Binario inválido (solo 0 y 1).');
                     }
@@ -226,20 +226,20 @@
             let convertedValue;
             if (toBase === 'decimal') {
                 convertedValue = decimalValue.toString(10);
-            } else if (toBase === 'binary') {
+            } else if (toBase === 'binario') {
                 convertedValue = decimalValue.toString(2);
             } else if (toBase === 'hex') {
                 convertedValue = decimalValue.toString(16).toUpperCase();
             }
 
             // Mostrar todas las conversiones para mayor utilidad
-            const binary = decimalValue.toString(2);
+            const binario = decimalValue.toString(2);
             const hex = decimalValue.toString(16).toUpperCase();
             const decimal = decimalValue.toString(10);
 
             result.innerHTML = `
                 <strong>Decimal:</strong> ${decimal}<br>
-                <strong>Binario:</strong> ${binary}<br>
+                <strong>Binario:</strong> ${binario}<br>
                 <strong>Hexadecimal:</strong> ${hex}<br>
                 <em>Conversión solicitada (${fromBase} a ${toBase}): ${convertedValue}</em>
             `;
@@ -263,7 +263,7 @@
             // Si fromBase no es decimal, primero convertir a decimal
             if (fromBase !== 'decimal') {
                 pasos += `1. Convertir de ${fromBase} a decimal:\n`;
-                if (fromBase === 'binary') {
+                if (fromBase === 'binario') {
                     pasos += generarPasosBinToDec(inputValue);
                 } else if (fromBase === 'hex') {
                     pasos += generarPasosHexToDec(inputValue);
@@ -274,7 +274,7 @@
             // Si toBase no es decimal, convertir de decimal a toBase
             if (toBase !== 'decimal') {
                 pasos += `2. Convertir de decimal a ${toBase}:\n`;
-                if (toBase === 'binary') {
+                if (toBase === 'binario') {
                     pasos += generarPasosDecToBin(decimalValue);
                 } else if (toBase === 'hex') {
                     pasos += generarPasosDecToHex(decimalValue);
@@ -376,7 +376,7 @@
             const fromSelect = document.getElementById('fromBase');
             if (value && fromSelect.value === 'decimal') { // Solo auto-detectar si está en decimal por defecto
                 if (/^[01]+$/.test(value)) {
-                    fromSelect.value = 'binary';
+                    fromSelect.value = 'binario';
                 } else if (/^[0-9A-Fa-f]+$/.test(value) && !/^[0-9]+$/.test(value)) {
                     fromSelect.value = 'hex';
                 }
